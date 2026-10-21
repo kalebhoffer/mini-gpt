@@ -3,6 +3,7 @@ Step 2: train the model.
 
     python train.py            # full run (~10M parameters)
     python train.py --quick    # tiny model, ~1 minute, to check everything works
+    python train.py --data-dir data/tinystories --out-dir checkpoints/tinystories
 
 The loop, over and over:
   1. grab a random batch of text chunks, x, and the same chunks shifted one
@@ -74,7 +75,7 @@ def get_lr(it: int, args) -> float:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data-dir", default="data")
+    ap.add_argument("--data-dir", default="data/shakespeare")
     ap.add_argument("--out-dir", default="checkpoints")
     ap.add_argument("--quick", action="store_true", help="tiny smoke-test run")
     # model shape
@@ -134,7 +135,7 @@ def main():
             marker = ""
             if losses["val"] < best_val:
                 best_val = losses["val"]
-                torch.save({"model": model.state_dict(), "config": asdict(cfg),
+                torch.save({"model": model.state_dict(), "config": asdict(cfg), "data_dir": args.data_dir,
                             "iter": it, "val_loss": best_val},
                            os.path.join(args.out_dir, "best.pt"))
                 marker = "  (saved best.pt)"
